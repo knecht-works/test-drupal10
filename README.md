@@ -14,7 +14,7 @@
 
 </div>
 
-A [DDEV](https://ddev.com)-based Drupal 10 project used as an end-to-end test fixture for [Knecht](https://knecht.works). It's a stock `standard` profile install with a tiny custom theme (`web/themes/custom/knecht`) that renders a demo front page built with the Knecht Styleguide Kit, so Knecht can boot the environment, hit the site, and assert against real CMS behavior (rendered Twig templates, database queries, the admin login). The database ships as a seed dump in `seed/db.sql.gz`, so no interactive installer is needed.
+A [DDEV](https://ddev.com)-based Drupal 10 project used as an end-to-end test fixture for [Knecht](https://knecht.works). It's a stock `standard` profile install with a tiny custom theme (`web/themes/custom/knecht`) that renders a demo front page built with the Knecht Styleguide Kit, so Knecht can boot the environment, hit the site, and assert against real CMS behavior (rendered Twig templates, database queries, the admin login). The database ships as a seed dump in `seed/db.sql.gz`, so no interactive installer is needed. Front-end assets (`src/`) are bundled with [Vite](https://vitejs.dev) via the [drupal/vite](https://www.drupal.org/project/vite) module: the "Vite bundle" row on the front page flips from "not loaded" to "loaded" once the built script runs.
 
 ## Setup
 
@@ -25,6 +25,8 @@ ddev start                                # boot the containers
 ddev composer install                     # install Drupal core, contrib and Drush
 ddev import-db --file=seed/db.sql.gz      # load the pre-installed site
 ddev drush cr                             # rebuild caches (optional)
+ddev npm install
+ddev npm run build                        # build src/ into web/dist, or `ddev npm run dev` for the Vite dev server
 ```
 
 The seed already contains the installed site (site name `test-drupal10`, default theme `knecht`) with one administrator account:
