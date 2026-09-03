@@ -10,26 +10,12 @@ use Drupal\Core\Url;
 /**
  * Implements hook_page_attachments_alter().
  *
- * Adds the Knecht favicons and a noindex robots tag to every page.
+ * Adds the favicon (web/favicon.svg) and a noindex robots tag to every page.
  */
 function knecht_page_attachments_alter(array &$attachments): void {
-  $base = 'https://knecht.works/styleguide/favicon/';
-  $links = [
-    'knecht_favicon_png' => ['rel' => 'icon', 'type' => 'image/png', 'href' => $base . 'favicon-96x96.png', 'sizes' => '96x96'],
-    'knecht_favicon_svg' => ['rel' => 'icon', 'type' => 'image/svg+xml', 'href' => $base . 'favicon.svg'],
-    'knecht_favicon_ico' => ['rel' => 'shortcut icon', 'href' => $base . 'favicon.ico'],
-    'knecht_apple_touch' => ['rel' => 'apple-touch-icon', 'sizes' => '180x180', 'href' => $base . 'apple-touch-icon.png'],
-    'knecht_manifest' => ['rel' => 'manifest', 'href' => $base . 'site.webmanifest'],
-  ];
-  foreach ($links as $key => $attributes) {
-    $attachments['#attached']['html_head'][] = [
-      ['#tag' => 'link', '#attributes' => $attributes],
-      $key,
-    ];
-  }
   $attachments['#attached']['html_head'][] = [
-    ['#tag' => 'meta', '#attributes' => ['name' => 'apple-mobile-web-app-title', 'content' => 'Knecht']],
-    'knecht_app_title',
+    ['#tag' => 'link', '#attributes' => ['rel' => 'icon', 'type' => 'image/svg+xml', 'href' => '/favicon.svg']],
+    'knecht_favicon',
   ];
   $attachments['#attached']['html_head'][] = [
     ['#tag' => 'meta', '#attributes' => ['name' => 'robots', 'content' => 'noindex,follow']],
