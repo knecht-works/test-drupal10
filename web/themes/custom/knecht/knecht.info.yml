@@ -1,0 +1,14 @@
+name: Knecht
+type: theme
+description: 'Minimal front-end theme for the Knecht test-drupal10 e2e fixture. Renders the demo front page with the Knecht Styleguide Kit.'
+package: Custom
+core_version_requirement: ^10
+base theme: false
+libraries:
+  - knecht/global
+regions:
+  content: Content
+features:
+  - node_user_picture
+  - comment_user_picture
+  - comment_user_verification

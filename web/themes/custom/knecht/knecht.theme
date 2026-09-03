@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Theme hooks for the Knecht test-drupal10 e2e fixture theme.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Adds the Knecht favicons and a noindex robots tag to every page.
+ */
+function knecht_page_attachments_alter(array &$attachments): void {
+  $base = 'https://knecht.works/styleguide/favicon/';
+  $links = [
+    'knecht_favicon_png' => ['rel' => 'icon', 'type' => 'image/png', 'href' => $base . 'favicon-96x96.png', 'sizes' => '96x96'],
+    'knecht_favicon_svg' => ['rel' => 'icon', 'type' => 'image/svg+xml', 'href' => $base . 'favicon.svg'],
+    'knecht_favicon_ico' => ['rel' => 'shortcut icon', 'href' => $base . 'favicon.ico'],
+    'knecht_apple_touch' => ['rel' => 'apple-touch-icon', 'sizes' => '180x180', 'href' => $base . 'apple-touch-icon.png'],
+    'knecht_manifest' => ['rel' => 'manifest', 'href' => $base . 'site.webmanifest'],
+  ];
+  foreach ($links as $key => $attributes) {
+    $attachments['#attached']['html_head'][] = [
+      ['#tag' => 'link', '#attributes' => $attributes],
+      $key,
+    ];
+  }
+  $attachments['#attached']['html_head'][] = [
+    ['#tag' => 'meta', '#attributes' => ['name' => 'apple-mobile-web-app-title', 'content' => 'Knecht']],
+    'knecht_app_title',
+  ];
+  $attachments['#attached']['html_head'][] = [
+    ['#tag' => 'meta', '#attributes' => ['name' => 'robots', 'content' => 'noindex,follow']],
+    'knecht_robots',
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ */
+function knecht_preprocess_html(array &$variables): void {
+  $variables['attributes']['class'][] = 'kit-body';
+  $variables['attributes']['class'][] = 'kit-light';
+
+  if (\Drupal::service('path.matcher')->isFrontPage()) {
+    $variables['head_title'] = ['title' => 'Drupal 10 Test | Knecht'];
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page.html.twig.
+ *
+ * Exposes live environment info to page--front.html.twig and makes sure the
+ * front page is never served from the page cache so the values stay fresh.
+ */
+function knecht_preprocess_page(array &$variables): void {
+  if (!\Drupal::service('path.matcher')->isFrontPage()) {
+    return;
+  }
+
+  \Drupal::service('page_cache_kill_switch')->trigger();
+
+  $request = \Drupal::request();
+  $host = $request->getHttpHost() ?: 'unknown';
+
+  $variables['knecht_host'] = $host;
+  $variables['knecht_time'] = date('H:i:s');
+  $variables['knecht_repo_url'] = 'https://github.com/knecht-works/test-drupal10';
+  $variables['knecht_login_url'] = Url::fromRoute('user.login')->toString();
+  $variables['knecht_env'] = [
+    'Host' => $host,
+    'PHP version' => PHP_VERSION,
+    'Drupal version' => \Drupal::VERSION,
+    'Server software' => $request->server->get('SERVER_SOFTWARE', '—'),
+    'Scheme' => $request->getScheme(),
+    'Request URI' => $request->getRequestUri(),
+    'Client IP' => $request->getClientIp() ?? '—',
+    'Timezone' => date_default_timezone_get(),
+    'Server time' => date('Y-m-d H:i:s'),
+  ];
+}
