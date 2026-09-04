@@ -49,3 +49,15 @@ $settings['hash_salt'] = 'knecht-test-drupal10-e2e-fixture-hash-salt-3f9c1a7e';
 $settings['trusted_host_patterns'] = ['.*'];
 $settings['skip_permissions_hardening'] = TRUE;
 $settings['state_cache'] = TRUE;
+
+// Vite HMR under Knecht: the dev server runs next to the site on its own
+// origin, handed in as KNECHT_DEV_SERVER_URL. Switch explicitly instead of
+// letting drupal/vite probe, because the probe result is baked into the
+// library cache at `drush cr`, which runs before the dev server is up, and
+// the public dev origin is not reachable from inside the container anyway.
+if ($knecht_dev_server = getenv('KNECHT_DEV_SERVER_URL')) {
+  $settings['vite'] = [
+    'useDevServer' => TRUE,
+    'devServerUrl' => rtrim($knecht_dev_server, '/'),
+  ];
+}
